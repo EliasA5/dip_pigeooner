@@ -1,7 +1,8 @@
 close all;
 clc;
 
-cam = webcam(1);
+cam = webcam('Microsoft');
+cam.Resolution = string(cam.AvailableResolutions(8));
 fig = figure;
 ax = subplot(2, 2, 1); 
 frame = snapshot(cam); 
@@ -15,13 +16,13 @@ subplot(2, 2, 2);imshow(base_frame);
 title('Current Foreground');
 
 blobAnalysis = vision.BlobAnalysis('AreaOutputPort', false, 'CentroidOutputPort', false, ...
-    'MinimumBlobArea', 1500);
+    'MinimumBlobArea', 10000);
 
 prev_filteredForeground = 0;
 frame_change = 0;
 
 while(1)
-pause(0.1);%get frame every 0.1 second
+pause(0.04);%get frame every 0.1 second
 frame = double(rgb2gray(snapshot(cam)))/255; 
 frame = imgaussfilt(frame,'FilterSize',21);
 
@@ -36,10 +37,10 @@ bbox = step(blobAnalysis, filteredForeground);
 
 
 
-result = insertShape(frame, 'Rectangle', bbox, 'Color', 'green');
+result = insertShape(frame, 'Rectangle', bbox, 'Color', 'green', 'LineWidth', 3);
 subplot(2, 2, 4); imshow(result); title('Detected Movment');
-
-base_frame = ((9.*base_frame)+frame)/10;
+alpha = 0.5;
+base_frame = (1-alpha).*base_frame + alpha.*frame;
 subplot(2, 2, 2);imshow(base_frame);
 title('Current Foreground');
 end
