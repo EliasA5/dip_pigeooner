@@ -20,12 +20,10 @@ for i = 1:data_size
     ex_features = struct('features', features, 'validPoints', validPoints); 
     features_st = [features_st ,ex_features];
 
-    save('extracted_features.mat', 'features_st');
-    %load('extracted_features.mat', 'features_st')
-
-
-
 end
+
+save('extracted_features.mat', 'features_st');
+    %load('extracted_features.mat', 'features_st')
 
 
 
