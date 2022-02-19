@@ -8,7 +8,7 @@
 % 
 % [features_num, score] = feature_detect(img, temp);
 
-function [counter, score] = feature_detect(test_img, bbox_test)
+function [counter, score] = feature_detect(test_img)
 % Detects matched features between training images and the test images
 % (video), Gets a test image and the bounding box, returns the number of
 % matched features and the score (number of features/overall features)
@@ -17,7 +17,7 @@ function [counter, score] = feature_detect(test_img, bbox_test)
    counter = 0;
    overall = 0;
    data_size = length(features_st);
-   points_test = detectSURFFeatures(test_img, "ROI", bbox_test, 'NumOctaves', 3,'NumScaleLevels', 3,'MetricThreshold',700);
+   points_test = detectSURFFeatures(test_img, 'NumOctaves', 3,'NumScaleLevels', 3,'MetricThreshold',700);
    [features_test,validPoints_test] = extractFeatures(test_img,points_test);
    
    for i = 1:data_size
@@ -30,7 +30,7 @@ function [counter, score] = feature_detect(test_img, bbox_test)
        counter = counter + matched_points.Count;
 
    end
-   score = counter/overall *100;
+   score = counter/overall;
 
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
