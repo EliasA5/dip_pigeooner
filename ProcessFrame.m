@@ -20,8 +20,8 @@ function [rgb_frame,frame,movement,flow,mask,pigeons,Predicted_bboxes] = Process
     % for i = height(Predicted_bboxes):-1:1
     %     x = Predicted_bboxes(i,1);
     %     y = Predicted_bboxes(i,2);
-    %     end_x = min(x+Predicted_bboxes(i,3),h_frame);
-    %     end_y = min(y+Predicted_bboxes(i,4),len_frame);
+    %     end_x = min(x+Predicted_bboxes(i,3),len_frame);
+    %     end_y = min(y+Predicted_bboxes(i,4),h_frame);
     %     pigeon = isPigeon(rgb_frame(y:end_y,x:end_x, :), frame(y:end_y,x:end_x), accumelated_features);
     %     if(~pigeon)
     %         Predicted_bboxes(i,:) = [];
