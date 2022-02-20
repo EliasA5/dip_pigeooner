@@ -118,7 +118,7 @@ function main()
                 while strcmp(hObject.String, 'Pause')
                     % Get input video frame and process each frame
     
-                    [rgb_frame,frame,movement,~,~,pigeons,Predicted_bboxes] = getAndProcessFrame(cam,opticFlow,Predicted_bboxes,blobAnalysis,threshhold,h_frame,len_frame);
+                    [rgb_frame,frame,movement,~,~,pigeons,Predicted_bboxes] = ProcessFrame(cam,opticFlow,Predicted_bboxes,blobAnalysis,threshhold,h_frame,len_frame);
                     showFrameOnAxis(hAxes.axis1, rgb_frame);
                     showFrameOnAxis(hAxes.axis2, frame);
                     showFrameOnAxis(hAxes.axis3, movement);
