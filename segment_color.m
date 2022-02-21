@@ -1,9 +1,9 @@
-function [mask, score] = segment_color(img)
-mask = dip_find_pigeon(img);
+function [mask, score] = segment_color(img, h_min, h_max, s_min, s_max, v_min, v_max)
+mask = dip_find_pigeon(img, h_min, h_max, s_min, s_max, v_min, v_max);
 score = sum(mask, 'all') / numel(mask);
 end
 
-function [filter] = dip_find_pigeon(img)
+function [filter] = dip_find_pigeon(img, h_min, h_max, s_min, s_max, v_min, v_max)
 hsv = uint8(255*rgb2hsv(img));
 
 cap_h = hsv(:,:,1);
@@ -14,9 +14,9 @@ cap_v = hsv(:,:,3);
 % subplot(2,3,5);imshow(cap_s);title('s');
 % subplot(2,3,6);imshow(cap_v);title('v');
 
-cap_h_filt = (cap_h >= 140) & (cap_h <= 158); %140 158
-cap_s_filt = (cap_s >= 10) & (cap_s <= 49); %25 49
-cap_v_filt = (cap_v >= 179) & (cap_v <= 255); %179 255
+cap_h_filt = (cap_h >= h_min) & (cap_h <= h_max); %140 158
+cap_s_filt = (cap_s >= s_min) & (cap_s <= s_max); %25 49
+cap_v_filt = (cap_v >= v_min) & (cap_v <= v_max); %179 255
 
 
 % subplot(2,3,1);imshow(cap_h_filt);title('h');
