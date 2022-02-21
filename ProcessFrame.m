@@ -1,6 +1,7 @@
-function [result, expected_bboxes, frames_count] = ...
+function [result,flow, expected_bboxes, frames_count] = ...
             ProcessFrame(cam, opticFlow, expected_bboxes, frames_count,...
-            blobAnalysis, threshhold, h_frame, len_frame, score_dist, isPigeon_threshhold, figure_selector)
+            blobAnalysis, threshhold, h_frame, len_frame, score_dist, isPigeon_threshhold, figure_selector,accumelated_features,...
+            h_min, h_max, s_min, s_max, v_min, v_max,bbox_overlap)
     rgb_frame = snapshot(cam);
     frame = rgb2gray(rgb_frame);
     flow = estimateFlow(opticFlow,frame);
@@ -22,7 +23,7 @@ function [result, expected_bboxes, frames_count] = ...
         
         if(~pigeon), continue; end %tmp_bbox(3)*tmp_bbox(4)*3 > numel(frame) || 
         if(isempty(expected_bboxes)), expected_bboxes = [tmp_bbox]; frames_count = [0]; continue; end
-        to_del = bboxOverlapRatio(tmp_bbox, expected_bboxes, 'min') > 0.4;
+        to_del = bboxOverlapRatio(tmp_bbox, expected_bboxes, 'min') > bbox_overlap;
         expected_bboxes(to_del, :) = [];
         frames_count(to_del) = [];
         expected_bboxes = [expected_bboxes; tmp_bbox];
