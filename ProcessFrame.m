@@ -9,6 +9,9 @@ function [result,flow, expected_bboxes, frames_count] = ...
     mask = imfill(medfilt2((flow.Magnitude > threshhold), [5 5]), 'holes');
 
     bbox = step(blobAnalysis, mask);
+    bbox2 = bbox;
+    
+      
 
     %check if object inside bbox is pigeon, remove entry if not
 
@@ -60,9 +63,14 @@ function [result,flow, expected_bboxes, frames_count] = ...
         case  'Detector'
             result = insertShape(frame, 'Rectangle', expected_bboxes, 'Color', 'green', 'LineWidth', 3);
         case 'Mask'
-            result = mask;
+            result = uint8(mask);
+        case 'Movement'
+            result = insertShape(frame, 'Rectangle', bbox2, 'Color', 'red', 'LineWidth', 3);
         case 'Color Segmentation'
             [result, ~] = segment_color(rgb_frame, h_min, h_max, s_min, s_max, v_min, v_max);
+
+            
+
     end
 end
     
