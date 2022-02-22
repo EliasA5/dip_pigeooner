@@ -1,7 +1,7 @@
 function [result,flow, expected_bboxes, frames_count] = ...
             ProcessFrame(cam, opticFlow, expected_bboxes, frames_count,...
             blobAnalysis, threshhold, h_frame, len_frame, score_dist, isPigeon_threshhold, figure_selector,accumelated_features,...
-            h_min, h_max, s_min, s_max, v_min, v_max,bbox_overlap, min_blobsize)
+            h_min, h_max, s_min, s_max, v_min, v_max,bbox_overlap, min_blobsize, area_ratio , feature_count)
     rgb_frame = snapshot(cam);
     frame = rgb2gray(rgb_frame);
     flow = estimateFlow(opticFlow,frame);
@@ -19,7 +19,7 @@ function [result,flow, expected_bboxes, frames_count] = ...
         %check every box
         tmp_bbox = bbox(i,:);
         pigeon = isPigeon(imcrop(rgb_frame, tmp_bbox), imcrop(frame, tmp_bbox), accumelated_features...
-            ,h_min, h_max, s_min, s_max, v_min, v_max, score_dist, isPigeon_threshhold);
+            ,h_min, h_max, s_min, s_max, v_min, v_max, score_dist, isPigeon_threshhold, area_ratio , feature_count);
         
         if(~pigeon), continue; end %tmp_bbox(3)*tmp_bbox(4)*3 > numel(frame) || 
         if(isempty(expected_bboxes)), expected_bboxes = [tmp_bbox]; frames_count = [0]; continue; end
@@ -47,11 +47,11 @@ function [result,flow, expected_bboxes, frames_count] = ...
 
         elseif(dx == 0 && dy == 0)
             frames_count(index) = frames_count(index) + 1;
-            if(frames_count > 10)
+            if(frames_count > 5)
                 starty = expected_bboxes(index,2);endy = min(expected_bboxes(index,2)+expected_bboxes(index,4), h_frame);
                 startx = expected_bboxes(index,1); endx = min(expected_bboxes(index,1)+expected_bboxes(index,3), len_frame);
                 pig = isPigeon(rgb_frame(starty:endy,startx:endx, :), frame(starty:endy,startx:endx), accumelated_features...
-                    , h_min, h_max, s_min, s_max, v_min, v_max, score_dist, isPigeon_threshhold);
+                    , h_min, h_max, s_min, s_max, v_min, v_max, score_dist, isPigeon_threshhold, area_ratio , feature_count);
                 if(~pig), to_del(index) = 1; end
             end
         end
@@ -63,11 +63,11 @@ function [result,flow, expected_bboxes, frames_count] = ...
         case  'Detector'
             result = insertShape(frame, 'Rectangle', expected_bboxes, 'Color', 'green', 'LineWidth', 3);
         case 'Mask'
-            result = uint8(mask);
+            result = im2uint8(mask);
         case 'Movement'
             result = insertShape(frame, 'Rectangle', bbox2, 'Color', 'red', 'LineWidth', 3);
         case 'Color Segmentation'
-            [result, ~] = segment_color(rgb_frame, h_min, h_max, s_min, s_max, v_min, v_max);
+            [result, ~] = segment_color(rgb_frame, h_min, h_max, s_min, s_max, v_min, v_max,1);
 
             
 

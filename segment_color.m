@@ -1,6 +1,6 @@
-function [mask, score] = segment_color(img, h_min, h_max, s_min, s_max, v_min, v_max)
+function [mask, score] = segment_color(img, h_min, h_max, s_min, s_max, v_min, v_max , ratio)
 mask = dip_find_pigeon(img, h_min, h_max, s_min, s_max, v_min, v_max);
-score = sum(mask, 'all') / numel(mask);
+score = min(1,sum(mask, 'all') /  (ratio * numel(mask)));
 end
 
 function [filter] = dip_find_pigeon(img, h_min, h_max, s_min, s_max, v_min, v_max)
@@ -24,6 +24,7 @@ cap_v_filt = (cap_v >= v_min) & (cap_v <= v_max); %179 255
 % subplot(2,3,3);imshow(cap_v_filt);title('v');
 
 filter = (cap_h_filt & cap_s_filt) | (cap_h_filt & cap_v_filt) | (cap_s_filt & cap_v_filt);
+%filter = (cap_h_filt & cap_s_filt & cap_v_filt) ;
 filter = imfill(filter, 4, 'holes');
 filter = medfilt2(filter,[5 5]);
 
