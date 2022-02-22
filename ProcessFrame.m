@@ -1,7 +1,7 @@
 function [result,flow, expected_bboxes, frames_count] = ...
             ProcessFrame(cam, opticFlow, expected_bboxes, frames_count,...
             blobAnalysis, threshhold, h_frame, len_frame, score_dist, isPigeon_threshhold, figure_selector,accumelated_features,...
-            h_min, h_max, s_min, s_max, v_min, v_max,bbox_overlap)
+            h_min, h_max, s_min, s_max, v_min, v_max,bbox_overlap, min_blobsize)
     rgb_frame = snapshot(cam);
     frame = rgb2gray(rgb_frame);
     flow = estimateFlow(opticFlow,frame);
@@ -15,10 +15,7 @@ function [result,flow, expected_bboxes, frames_count] = ...
     for i=1:height(bbox)
         %check every box
         tmp_bbox = bbox(i,:);
-
-        starty = tmp_bbox(2);endy = min(tmp_bbox(2)+tmp_bbox(4), h_frame);
-        startx = tmp_bbox(1); endx = min(tmp_bbox(1)+tmp_bbox(3), len_frame);
-        pigeon = isPigeon(rgb_frame(starty:endy,startx:endx, :), frame(starty:endy,startx:endx), accumelated_features...
+        pigeon = isPigeon(imcrop(rgb_frame, tmp_bbox), imcrop(frame, tmp_bbox), accumelated_features...
             ,h_min, h_max, s_min, s_max, v_min, v_max, score_dist, isPigeon_threshhold);
         
         if(~pigeon), continue; end %tmp_bbox(3)*tmp_bbox(4)*3 > numel(frame) || 
@@ -32,17 +29,19 @@ function [result,flow, expected_bboxes, frames_count] = ...
 
     to_del = zeros(height(expected_bboxes),1, 'logical');
     for index=1:height(expected_bboxes)
-        startx = expected_bboxes(index, 1);
-        endx = min(expected_bboxes(index, 1)+expected_bboxes(index, 3), length(frame));
-        starty = expected_bboxes(index, 2);
-        endy = min(expected_bboxes(index, 2)+expected_bboxes(index, 4), height(frame));
-        dx = int32(mean(flow.Vx(starty: endy, startx:endx), 'all'));
-        dy = int32(mean(flow.Vy(starty: endy, startx:endx), 'all'));
+        dx = int32(mean(imcrop(flow.Vx, expected_bboxes(index, :)), 'all'));
+        dy = int32(mean(imcrop(flow.Vy, expected_bboxes(index, :)), 'all'));
         expected_bboxes(index, 1) = expected_bboxes(index, 1) + 1.32*dx;
         expected_bboxes(index, 2) = expected_bboxes(index, 2) + 1.32*dy;
-        if(expected_bboxes(index, 1) < 1 ||  (expected_bboxes(index, 1)+expected_bboxes(index, 3)) > length(frame) ||...
-                expected_bboxes(index, 2) < 1 || (expected_bboxes(index, 2)+expected_bboxes(index, 4)) > height(frame))
-            to_del(index) = 1;
+        if(expected_bboxes(index, 1) < 1 ||  (expected_bboxes(index, 1)+expected_bboxes(index, 3)) > len_frame ||...
+                expected_bboxes(index, 2) < 1 || (expected_bboxes(index, 2)+expected_bboxes(index, 4)) > h_frame)
+            if(expected_bboxes(index, 3) * expected_bboxes(index,4) < min_blobsize)
+                to_del(index) = 1; continue; end
+            expected_bboxes(index, 1) = max(expected_bboxes(index, 1), 1);
+            expected_bboxes(index, 2) = max(expected_bboxes(index, 2), 1);
+            expected_bboxes(index, 3) = min(expected_bboxes(index, 3), len_frame - expected_bboxes(index, 1));
+            expected_bboxes(index, 4) = min(expected_bboxes(index,4), h_frame - expected_bboxes(index, 2));
+
         elseif(dx == 0 && dy == 0)
             frames_count(index) = frames_count(index) + 1;
             if(frames_count > 10)
