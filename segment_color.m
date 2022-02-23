@@ -29,3 +29,18 @@ filter = imfill(filter, 4, 'holes');
 filter = medfilt2(filter,[5 5]);
 
 end
+
+function [filter] = dip_find_pigeon_rgb(img, r_min, r_max, g_min, g_max, b_min, b_max)
+    cap_r = img(:,:,1);
+    cap_g = img(:,:,2);
+    cap_b = img(:,:,3);
+
+    cap_r_filt = (cap_r >= r_min) & (cap_r <= r_max); %140 158
+    cap_g_filt = (cap_g >= g_min) & (cap_g <= g_max); %25 49
+    cap_b_filt = (cap_b >= b_min) & (cap_b <= b_max); %179 255
+
+    filter = (cap_r_filt & cap_g_filt) | (cap_r_filt & cap_b_filt) | (cap_g_filt & cap_b_filt);
+    %filter = (cap_h_filt & cap_s_filt & cap_v_filt) ;
+    filter = imfill(filter, 4, 'holes');
+    filter = medfilt2(filter,[5 5]);
+end
