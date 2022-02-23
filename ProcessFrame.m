@@ -47,7 +47,9 @@ function [result,flow, expected_bboxes, frames_count] = ...
 
         elseif(dx == 0 && dy == 0)
             frames_count(index) = frames_count(index) + 1;
-            if(frames_count > 5)
+            if(frames_count(index) > 50)
+                to_del(index) = 1;
+            elseif(frames_count(index) > 5)
                 starty = expected_bboxes(index,2);endy = min(expected_bboxes(index,2)+expected_bboxes(index,4), h_frame);
                 startx = expected_bboxes(index,1); endx = min(expected_bboxes(index,1)+expected_bboxes(index,3), len_frame);
                 pig = isPigeon(rgb_frame(starty:endy,startx:endx, :), frame(starty:endy,startx:endx), accumelated_features...
