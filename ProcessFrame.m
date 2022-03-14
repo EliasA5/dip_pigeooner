@@ -6,7 +6,7 @@ function [result,flow, expected_bboxes, frames_count] = ...
     frame = rgb2gray(rgb_frame);
     flow = estimateFlow(opticFlow,frame);
 
-    mask = imfill(medfilt2((flow.Magnitude > threshhold), [5 5]), 'holes');
+    mask = imfill(medfilt2((flow.Magnitude > threshhold), [5 5]), 4, 'holes');
 
     bbox = step(blobAnalysis, mask);
     bbox2 = bbox;
@@ -18,7 +18,7 @@ function [result,flow, expected_bboxes, frames_count] = ...
     for i=1:height(bbox)
         %check every box
         tmp_bbox = bbox(i,:);
-        pigeon = isPigeon(imcrop(rgb_frame, tmp_bbox), imcrop(frame, tmp_bbox), accumelated_features...
+        [pigeon, ~] = isPigeon(imcrop(rgb_frame, tmp_bbox), imcrop(frame, tmp_bbox), accumelated_features...
             ,h_min, h_max, s_min, s_max, v_min, v_max, score_dist, isPigeon_threshhold, area_ratio , feature_count);
         
         if(~pigeon), continue; end %tmp_bbox(3)*tmp_bbox(4)*3 > numel(frame) || 
@@ -52,7 +52,7 @@ function [result,flow, expected_bboxes, frames_count] = ...
             elseif(frames_count(index) > 5)
                 starty = expected_bboxes(index,2);endy = min(expected_bboxes(index,2)+expected_bboxes(index,4), h_frame);
                 startx = expected_bboxes(index,1); endx = min(expected_bboxes(index,1)+expected_bboxes(index,3), len_frame);
-                pig = isPigeon(rgb_frame(starty:endy,startx:endx, :), frame(starty:endy,startx:endx), accumelated_features...
+                [pig,~] = isPigeon(rgb_frame(starty:endy,startx:endx, :), frame(starty:endy,startx:endx), accumelated_features...
                     , h_min, h_max, s_min, s_max, v_min, v_max, score_dist, isPigeon_threshhold, area_ratio , feature_count);
                 if(~pig), to_del(index) = 1; end
             end

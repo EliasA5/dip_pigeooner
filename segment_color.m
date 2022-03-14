@@ -23,10 +23,12 @@ cap_v_filt = (cap_v >= v_min) & (cap_v <= v_max); %179 255
 % subplot(2,3,2);imshow(cap_s_filt);title('s');
 % subplot(2,3,3);imshow(cap_v_filt);title('v');
 
+
 filter = (cap_h_filt & cap_s_filt) | (cap_h_filt & cap_v_filt) | (cap_s_filt & cap_v_filt);
 %filter = (cap_h_filt & cap_s_filt & cap_v_filt) ;
-filter = imfill(filter, 4, 'holes');
 filter = medfilt2(filter,[5 5]);
+filter = imfill(filter, 8, 'holes');
+% subplot(2,3,5);imshow(filter);title("filtered");
 
 end
 
