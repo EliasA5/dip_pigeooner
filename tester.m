@@ -20,7 +20,7 @@ time_blobs = zeros(size(range));
 
 
 for i=range
-img = imread(output.files(i));
+img = imread(append("testing_images/", output.files(i)));
 pigeon_img = imcrop(img, output.bounding_boxes(i, :));
 pigeon_img_gray = rgb2gray(pigeon_img);
 
